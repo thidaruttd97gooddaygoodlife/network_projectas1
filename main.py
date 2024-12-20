@@ -1,21 +1,27 @@
 # main.py
 from graph import DistributedGraph
 from bellman_ford import DistributedBellmanFord
+import random
 
-# Example: Create a graph with negative cycle
-nodes = [0, 1, 2, 3]
-graph = DistributedGraph(nodes)
-graph.add_edge(0, 1, 5)
-graph.add_edge(1, 2, 10)
-graph.add_edge(2, 3, 3)
-graph.add_edge(3, 1, 2)  # Negative cycle
+if __name__ == "__main__":
+    # Create a graph with 30 nodes
+    num_nodes = 30
+    graph = DistributedGraph(num_nodes)
 
-# Run Distributed Bellman-Ford
-source = 0
-distributed_bellman_ford = DistributedBellmanFord(graph, source)
-distributed_bellman_ford.run()
+    # Add some random edges between nodes
+    for _ in range(100):  # Adding 100 random edges with random weights
+        source = random.randint(0, num_nodes-1)
+        dest = random.randint(0, num_nodes-1)
+        weight = random.randint(1, 10)  # Random weight between 1 and 10
+        graph.add_edge(source, dest, weight)
 
-# Output results
-print("Final Distances:")
-for node, distance in distributed_bellman_ford.distances.items():
-    print(f"Node {node}: {distance}")
+    # Print the graph for reference
+    print("Graph structure:")
+    graph.print_graph()
+
+    # Choose a source node (e.g., node 0)
+    source_node = 0
+
+    # Run the Distributed Bellman-Ford algorithm
+    d_bf = DistributedBellmanFord(graph, source_node)
+    d_bf.run()
