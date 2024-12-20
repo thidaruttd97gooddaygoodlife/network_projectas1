@@ -1,28 +1,21 @@
-from graph import Graph
-from bellman_ford import BellmanFord
+# main.py
+from graph import DistributedGraph
+from bellman_ford import DistributedBellmanFord
 
-# Initialize the graph with 6 nodes (0 to 5)
-nodes = [0, 1, 2, 3, 4, 5]
-graph = Graph(nodes)
-
-# Add edges to the graph
-graph.add_edge(0, 1, 4)
-graph.add_edge(0, 2, 2)
-graph.add_edge(1, 2, 3)
-graph.add_edge(1, 3, 2)
+# Example: Create a graph with negative cycle
+nodes = [0, 1, 2, 3]
+graph = DistributedGraph(nodes)
+graph.add_edge(0, 1, 5)
+graph.add_edge(1, 2, 10)
 graph.add_edge(2, 3, 3)
-graph.add_edge(2, 4, 1)
-graph.add_edge(3, 5, 4)
-graph.add_edge(4, 5, -10)
+graph.add_edge(3, 1, 2)  # Negative cycle
 
-# Create BellmanFord instance and run the algorithm
-bellman_ford = BellmanFord(graph)
-negative_cycle, distances, predecessors = bellman_ford.detect_negative_cycle()
+# Run Distributed Bellman-Ford
+source = 0
+distributed_bellman_ford = DistributedBellmanFord(graph, source)
+distributed_bellman_ford.run()
 
 # Output results
-if negative_cycle:
-    print("Negative cycle detected.")
-else:
-    print("Final Distances:")
-    for node, distance in distances.items():
-        print(f"Node {node}: {distance}")
+print("Final Distances:")
+for node, distance in distributed_bellman_ford.distances.items():
+    print(f"Node {node}: {distance}")

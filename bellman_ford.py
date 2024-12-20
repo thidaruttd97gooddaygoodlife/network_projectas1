@@ -1,30 +1,45 @@
-class BellmanFord:
-    def __init__(self, graph):
+# bellman_ford.py
+import time
+from collections import defaultdict
+from graph import DistributedGraph
+import random 
+
+class DistributedBellmanFord:
+    def __init__(self, graph, source):
         self.graph = graph
-        self.adj_list = graph.get_adj_list()
+        self.source = source
+        self.distances = defaultdict(lambda: float('inf'))
+        self.predecessors = defaultdict(lambda: None)
+        self.distances[source] = 0
+
+    def run(self, max_iterations=10):
+        for iteration in range(max_iterations):
+            print(f"Iteration {iteration}")
+            updated = False
+
+            for node in self.graph.adj_list:
+                for neighbor, weight in self.graph.get_neighbors(node):
+                    new_distance = self.distances[node] + weight
+                    if new_distance < self.distances[neighbor]:
+                        self.distances[neighbor] = new_distance
+                        self.predecessors[neighbor] = node
+                        updated = True
+
+            if not updated:
+                print("No updates in this iteration. Algorithm converged.")
+                break
+
+            # Simulate communication between neighbors
+            time.sleep(random.uniform(0.1, 0.3))  # Simulate network delay
+
+        self.detect_negative_cycle()
 
     def detect_negative_cycle(self):
-        nodes = list(self.adj_list.keys())
-        distances = {node: float('inf') for node in nodes}
-        distances[0] = 0  # Set the source node (usually node 0) to 0
-        predecessors = {node: None for node in nodes}
-
-        # Bellman-Ford algorithm to find the shortest paths
-        for iteration in range(len(nodes) - 1):
-            print(f"Iteration {iteration}:")
-            for u in nodes:
-                for v, weight in self.adj_list[u]:
-                    print(f"Processing edge {u} -> {v} with weight {weight}")
-                    if distances[u] + weight < distances[v]:
-                        distances[v] = distances[u] + weight
-                        predecessors[v] = u
-                        print(f"Updated distance to node {v}: {distances[v]}")
-
-        # Check for negative cycles
-        for u in nodes:
-            for v, weight in self.adj_list[u]:
-                if distances[u] + weight < distances[v]:
-                    print(f"Negative cycle detected via edge {u} -> {v} with weight {weight}")
-                    return True, distances, predecessors
-
-        return False, distances, predecessors
+        # Check for negative cycle by running one more iteration
+        for node in self.graph.adj_list:
+            for neighbor, weight in self.graph.get_neighbors(node):
+                if self.distances[node] + weight < self.distances[neighbor]:
+                    print(f"Negative cycle detected via edge {node} -> {neighbor} with weight {weight}")
+                    return True
+        print("No negative cycle detected.")
+        return False
