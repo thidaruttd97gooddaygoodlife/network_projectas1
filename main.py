@@ -12,7 +12,7 @@ if __name__ == "__main__":
     for _ in range(100):  # Adding 100 random edges with random weights
         source = random.randint(0, num_nodes-1)
         dest = random.randint(0, num_nodes-1)
-        weight = random.randint(1, 10)  # Random weight between 1 and 10
+        weight = random.randint(1, 10)  # Random weight between -1 and 10
         graph.add_edge(source, dest, weight)
 
     # Print the graph for reference
